@@ -132,6 +132,10 @@ export const DataTable = ({ data }: Props) => {
       <ModalNewUser isOpen={modalUserOpen}>
         <View style={styles.container2}>
           <View style={styles.modal}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10 }}>
+              <Text style={{ fontWeight: 500, fontSize: 28 }}>Crear Usuario</Text>
+            </View>
+
             <View style={styles.modalRow}>
               <View>
                 <Text style={styles.subtitles2}>Departamento</Text>
@@ -203,6 +207,9 @@ export const DataTable = ({ data }: Props) => {
       <ModalEdit isOpen={modalOpen}>
         <View style={styles.container2}>
           <View style={styles.modal}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10 }}>
+              <Text style={{ fontWeight: 500, fontSize: 28 }}>Editar Usuario</Text>
+            </View>
             <View style={styles.modalRow}>
               <View>
                 <Text style={styles.subtitles2}>Departamento</Text>
