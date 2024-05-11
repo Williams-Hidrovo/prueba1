@@ -62,14 +62,14 @@ export const DataTable = ({ data }: Props) => {
   })
   const [inputValue, setInputValue] = useState('')
 
-  const handleInputChange = (name, value) => {
+  const handleInputChange = (name: any, value: any) => {
     setUserEditar(() => ({
       ...userEditar!,
       [name]: value
     }))
   }
 
-  const handleNewInputChange = (name, value) => {
+  const handleNewInputChange = (name: any, value: any) => {
     setNewUser(() => ({
       ...newUser!,
       [name]: value
@@ -392,7 +392,7 @@ export const DataTable = ({ data }: Props) => {
                   style={{ backgroundColor: '#006AB2', width: 143, height: 37, marginHorizontal: 15, borderRadius: 5 }}
                   onPress={async () => {
                     console.log(userEditar)
-                    await updateUser(userEditar.id, userEditar).then(resp => {
+                    await updateUser(userEditar!.id, userEditar).then(resp => {
                       console.log(resp)
                       setUsers(prevState => {
                         const nuevos = [...prevState]
