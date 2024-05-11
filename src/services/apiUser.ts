@@ -5,6 +5,7 @@ export const createUser = async (user: user) => {
   try {
     const response = await axios.post('http://localhost:3001/api/users', user)
     console.log('usuario creado')
+    return Promise.resolve(true)
   } catch (err) {
     console.log(err)
   }
@@ -24,6 +25,7 @@ export const updateUser = async (userId: number, user1: user) => {
   try {
     const response = await axios.put(`http://localhost:3001/api/users/${userId}`, user1)
     console.log('Usuario actualizado:', response.data)
+    return Promise.resolve(true)
   } catch (error) {
     console.error('Error al actualizar el usuario:')
   }

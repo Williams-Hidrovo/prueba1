@@ -38,7 +38,7 @@ const data: user[] = [
 ]
 
 const departamentos = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-const cargos = [1, 2, 3, 4, 5]
+const cargos = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 //**************************************COMPONENTE */
 //************************************************** */
@@ -87,6 +87,14 @@ export const DataTable = ({ data }: Props) => {
       return
     }
     setUsers(data.filter(usuario => usuario.idCargo === id))
+  }
+  function filtrarDepar(id: number): void {
+    console.log(id)
+    if (id === 0) {
+      setBorrar(!borrar)
+      return
+    }
+    setUsers(data.filter(usuario => usuario.idDepartamento === id))
   }
 
   const renderItem = ({ item }: { item: user }) => {
@@ -142,7 +150,7 @@ export const DataTable = ({ data }: Props) => {
               ))}
             </Picker>
           </View>
-          <Picker style={styles.combo} selectedValue={depar} onValueChange={(itemValue, itemIndex) => setDepar(itemValue)}>
+          <Picker style={styles.combo} selectedValue={depar} onValueChange={(itemValue, index) => filtrarDepar(parseInt(itemValue!))}>
             <Picker.Item label="departamentos" value={0} />
             {departamentos.map(d => (
               <Picker.Item key={d.toString()} label={d.toString()} value={d} />
@@ -255,10 +263,17 @@ export const DataTable = ({ data }: Props) => {
               <View style={{ margin: 10 }}>
                 <Pressable
                   style={{ backgroundColor: '#006AB2', width: 143, height: 37, marginHorizontal: 15, borderRadius: 5 }}
-                  onPress={() => {
+                  onPress={async () => {
                     console.log(newUser)
-                    createUser(newUser)
-                    setBorrar(!borrar)
+                    await createUser(newUser).then(resp => {
+                      console.log(resp)
+                      setUsers(prevState => {
+                        newUser.id = 2102
+                        prevState.push(newUser)
+                        return prevState
+                      })
+                    })
+                    setBorrar(borrar => !borrar)
                     setModalUserOpen(false)
                   }}
                 >
@@ -375,10 +390,26 @@ export const DataTable = ({ data }: Props) => {
               <View style={{ margin: 10 }}>
                 <Pressable
                   style={{ backgroundColor: '#006AB2', width: 143, height: 37, marginHorizontal: 15, borderRadius: 5 }}
-                  onPress={() => {
+                  onPress={async () => {
                     console.log(userEditar)
-                    updateUser(userEditar.id, userEditar)
-                    setBorrar(!borrar)
+                    await updateUser(userEditar.id, userEditar).then(resp => {
+                      console.log(resp)
+                      setUsers(prevState => {
+                        const nuevos = [...prevState]
+                        const indice = nuevos.findIndex(user => user.id === userEditar?.id)
+
+                        if (indice !== -1) {
+                          nuevos[indice].idCargo = userEditar!.idCargo
+                          nuevos[indice].idDepartamento = userEditar!.idDepartamento
+                          nuevos[indice].primerApellido = userEditar!.primerApellido
+                          nuevos[indice].segundoApellido = userEditar!.segundoApellido
+                          nuevos[indice].primerNombre = userEditar!.primerNombre
+                          nuevos[indice].segundoNombre = userEditar!.segundoNombre
+                        }
+
+                        return nuevos
+                      })
+                    })
                     setModalOpen(false)
                   }}
                 >
