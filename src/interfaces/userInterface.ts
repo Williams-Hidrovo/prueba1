@@ -1,5 +1,5 @@
 export interface user {
-  id: number
+  id?: number
   usuario: string
   primerNombre: string
   segundoNombre: string
@@ -7,4 +7,8 @@ export interface user {
   segundoApellido: string
   idDepartamento: number
   idCargo: number
+}
+
+export interface apiResponse {
+  users: user[]
 }

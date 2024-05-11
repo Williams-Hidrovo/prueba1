@@ -83,12 +83,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 30
   },
   title: {
-    fontSize: 26,
-    fontWeight: 700
+    fontSize: 26
+    //fontWeight: 700
   },
   subtitle: {
-    fontSize: 16,
-    fontWeight: 300
+    fontSize: 16
+    //fontWeight: 300
   }
 })
 
