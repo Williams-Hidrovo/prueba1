@@ -177,8 +177,8 @@ export const DataTable = ({ data }: Props) => {
       <ModalNewUser isOpen={modalUserOpen}>
         <View style={styles.container2}>
           <View style={styles.modal}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10 }}>
-              <Text style={{ fontSize: 28 }}>Crear Usuario</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10, borderBottomColor: '#f0f0f0', borderBottomWidth: 1 }}>
+              <Text style={{ fontSize: 28, paddingVertical: 5 }}>Registrar Usuario</Text>
             </View>
 
             <View style={styles.modalRow}>
@@ -259,30 +259,33 @@ export const DataTable = ({ data }: Props) => {
               </View>
             </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', borderTopColor: '#f0f0f0', borderTopWidth: 1 }}>
               <View style={{ margin: 10 }}>
                 <Pressable
                   style={{ backgroundColor: '#006AB2', width: 143, height: 37, marginHorizontal: 15, borderRadius: 5 }}
                   onPress={async () => {
-                    console.log(newUser)
-                    await createUser(newUser).then(resp => {
-                      console.log(resp)
-                      setUsers(prevState => {
-                        newUser.id = 2102
-                        prevState.push(newUser)
-                        return prevState
+                    try {
+                      console.log(newUser)
+                      await createUser(newUser).then(resp => {
+                        console.log(resp)
+                        setUsers(prevState => {
+                          newUser.id = 2102
+                          prevState.push(newUser)
+                          return prevState
+                        })
                       })
-                    })
+                    } catch (error) {}
+
                     setBorrar(borrar => !borrar)
                     setModalUserOpen(false)
                   }}
                 >
-                  <Text style={{ color: 'white', textAlign: 'center' }}>Registrar</Text>
+                  <Text style={{ color: 'white', textAlign: 'center', paddingVertical: 5 }}>Registrar</Text>
                 </Pressable>
               </View>
               <View style={{ margin: 10 }}>
                 <Pressable style={{ backgroundColor: '#DFE1E5', width: 143, height: 37, borderRadius: 5 }} onPress={() => setModalUserOpen(false)}>
-                  <Text style={{ color: 'black', textAlign: 'center', flex: 1, justifyContent: 'center' }}>Cancelar</Text>
+                  <Text style={{ color: 'black', textAlign: 'center', paddingVertical: 5 }}>Cancelar</Text>
                 </Pressable>
               </View>
             </View>
@@ -296,8 +299,8 @@ export const DataTable = ({ data }: Props) => {
       <ModalEdit isOpen={modalOpen}>
         <View style={styles.container2}>
           <View style={styles.modal}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10 }}>
-              <Text style={{ fontSize: 28 }}>Editar Usuario</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10, borderBottomColor: '#f0f0f0', borderBottomWidth: 1 }}>
+              <Text style={{ fontSize: 28, paddingVertical: 5 }}>Editar Usuario</Text>
             </View>
             <View style={styles.modalRow}>
               <View>
@@ -386,8 +389,8 @@ export const DataTable = ({ data }: Props) => {
               </View>
             </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-              <View style={{ margin: 10 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', borderTopWidth: 1, borderTopColor: '#f0f0f0' }}>
+              <View style={{ marginVertical: 10 }}>
                 <Pressable
                   style={{ backgroundColor: '#006AB2', width: 143, height: 37, marginHorizontal: 15, borderRadius: 5 }}
                   onPress={async () => {
@@ -413,12 +416,12 @@ export const DataTable = ({ data }: Props) => {
                     setModalOpen(false)
                   }}
                 >
-                  <Text style={{ color: 'white', textAlign: 'center' }}>Actualizar</Text>
+                  <Text style={{ color: 'white', textAlign: 'center', paddingVertical: 5 }}>Actualizar</Text>
                 </Pressable>
               </View>
               <View style={{ margin: 10 }}>
                 <Pressable style={{ backgroundColor: '#DFE1E5', width: 143, height: 37, borderRadius: 5 }} onPress={() => setModalOpen(false)}>
-                  <Text style={{ color: 'black', textAlign: 'center', flex: 1, justifyContent: 'center' }}>Cancelar</Text>
+                  <Text style={{ color: 'black', textAlign: 'center', paddingVertical: 5 }}>Cancelar</Text>
                 </Pressable>
               </View>
             </View>
@@ -426,7 +429,9 @@ export const DataTable = ({ data }: Props) => {
         </View>
       </ModalEdit>
       <FlatList data={users} keyExtractor={item => item.id!.toString()} renderItem={renderItem} />
-      <Text>Total Registros {users.length}</Text>
+      <View style={{ flex: 1, justifyContent: 'center', minHeight: 50, backgroundColor: '#f0f0f0', marginVertical: 5 }}>
+        <Text>Total Registros: {users.length}</Text>
+      </View>
     </View>
   )
 }

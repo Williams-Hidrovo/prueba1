@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { user } from './src/interfaces/userInterface'
 import { DataTable } from './src/presentation/components'
 
@@ -67,13 +67,13 @@ const data: user[] = [
 
 const App = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <ScrollView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <Text style={styles.title}>Modulo de Administracion</Text>
         <Text style={styles.subtitle}>Administracion de Usuarios</Text>
+        <Text style={styles.title}>Modulo de Administracion</Text>
       </View>
       <DataTable data={data} />
-    </SafeAreaView>
+    </ScrollView>
   )
 }
 
