@@ -2,8 +2,9 @@ import { Picker } from '@react-native-picker/picker'
 import React, { useEffect, useState } from 'react'
 import { FlatList, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import { Icon } from 'react-native-elements'
-import { user } from '../../interfaces/userInterface'
+import { ICargos, IDepartamentos, user } from '../../interfaces/userInterface'
 import { createUser, deleteUser, getUsersFetch, updateUser } from '../../services'
+import { ModalBorrar } from './ModalBorrar'
 import { ModalEdit } from './ModalEdit'
 import { ModalNewUser } from './ModalNewUser'
 
@@ -37,16 +38,41 @@ const data: user[] = [
   }
 ]
 
-const departamentos = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-const cargos = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
+const departamentosM = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+const cargosM = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+const deparsLetras = [
+  'Departamentos',
+  'Recursos Humanos',
+  'Finanzas',
+  'Tecnología',
+  'Marketing',
+  'Ventas',
+  'Logística',
+  'Desarrollo de Producto',
+  'Servicio al Cliente',
+  'Recursos Materiales'
+]
+const cargosLetras = [
+  'Cargos',
+  'Analista de Sistemas',
+  'Desarrollador Backend',
+  'Ingeniero de Software',
+  'Arquitecto de Soluciones',
+  'Especialista en Seguridad',
+  'Consultor de TI',
+  'Desarrollador Frontend'
+]
 //**************************************COMPONENTE */
 //************************************************** */
 
 export const DataTable = ({ data }: Props) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalUserOpen, setModalUserOpen] = useState(false)
+  const [modalEliminar, setModalEliminar] = useState(false)
   const [users, setUsers] = useState<user[]>(data)
+  const [resUsers, setResUsers] = useState<user[]>(data)
+  const [cargos, setCargos] = useState<ICargos[]>([])
+  const [departamentos, setDepartamentos] = useState<IDepartamentos[]>([])
   const [depar, setDepar] = useState()
   const [cargo, setCargo] = useState()
   const [borrar, setBorrar] = useState(false)
@@ -80,21 +106,39 @@ export const DataTable = ({ data }: Props) => {
     setUsers(data.filter(usuario => usuario.id !== id))
   }
 
-  function filtrarCargo(id: number): void {
-    console.log(id)
-    if (id === 0) {
-      setBorrar(!borrar)
-      return
-    }
-    setUsers(data.filter(usuario => usuario.idCargo === id))
+  const formatearDatos = (format: user[]): user[] => {
+    const usuariosConLetras = format.map((usuario: user) => ({
+      ...usuario,
+      idDepartamento: deparsLetras[usuario.idDepartamento],
+      idCargo: cargosLetras[usuario.idCargo]
+    }))
+    return usuariosConLetras
   }
-  function filtrarDepar(id: number): void {
-    console.log(id)
-    if (id === 0) {
+
+  const formatearDatosINVER = (user: user): user => {
+    const user1: user = {
+      ...user,
+      idDepartamento: departamentos[deparsLetras.indexOf(user.idDepartamento)],
+      idCargo: cargos[cargosLetras.indexOf(user.idDepartamento)]
+    }
+    return user1
+  }
+
+  function filtrarCargo(id: number | string): void {
+    if (id === 'Cargos') {
       setBorrar(!borrar)
       return
     }
-    setUsers(data.filter(usuario => usuario.idDepartamento === id))
+    const filtro = formatearDatos(resUsers).filter(usuario => usuario.idCargo === id)
+    setUsers(filtro)
+  }
+  function filtrarDepar(id: number | string): void {
+    if (id === 'Departamentos') {
+      setBorrar(!borrar)
+      return
+    }
+    const filtro = formatearDatos(resUsers).filter(usuario => usuario.idDepartamento === id)
+    setUsers(filtro)
   }
 
   const renderItem = ({ item }: { item: user }) => {
@@ -118,8 +162,8 @@ export const DataTable = ({ data }: Props) => {
         <Pressable
           style={styles.acciones}
           onPress={async () => {
-            setBorrar(!borrar)
-            deleteUser(item.id!)
+            setModalEliminar(true)
+            setUserEditar(item)
           }}
         >
           <Icon name="trash-outline" type="ionicon" color={'#E51156'} />
@@ -130,10 +174,17 @@ export const DataTable = ({ data }: Props) => {
   }
 
   useEffect(() => {
-    getUsersFetch().then(rest => {
-      setUsers(rest)
-    })
+    getUsersFetch()
+      .then(rest => {
+        setUsers(formatearDatos(rest))
+        setResUsers(rest)
+      })
+      .catch(error => {
+        console.log('Error en la promesaxxxxxxxxxxxxxxxxx:', error)
+        // Maneja el error aquí
+      })
   }, [borrar, modalOpen, modalUserOpen])
+
   /*
 **********************VISTA PRINCIPAL
 //**********************************************************
@@ -143,16 +194,14 @@ export const DataTable = ({ data }: Props) => {
       <View style={styles.flex}>
         <View style={{ flexDirection: 'row' }}>
           <View>
-            <Picker style={styles.combo} selectedValue={cargo} onValueChange={(itemValue, index) => filtrarCargo(parseInt(itemValue!))}>
-              <Picker.Item label="cargos" value={0} />
-              {cargos.map(d => (
+            <Picker style={styles.combo} selectedValue={cargo} onValueChange={(itemValue, index) => filtrarCargo(itemValue!)}>
+              {cargosLetras.map(d => (
                 <Picker.Item key={d.toString()} label={d.toString()} value={d} />
               ))}
             </Picker>
           </View>
-          <Picker style={styles.combo} selectedValue={depar} onValueChange={(itemValue, index) => filtrarDepar(parseInt(itemValue!))}>
-            <Picker.Item label="departamentos" value={0} />
-            {departamentos.map(d => (
+          <Picker style={styles.combo} selectedValue={depar} onValueChange={(itemValue, index) => filtrarDepar(itemValue!)}>
+            {deparsLetras.map(d => (
               <Picker.Item key={d.toString()} label={d.toString()} value={d} />
             ))}
           </Picker>
@@ -177,16 +226,15 @@ export const DataTable = ({ data }: Props) => {
       <ModalNewUser isOpen={modalUserOpen}>
         <View style={styles.container2}>
           <View style={styles.modal}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', marginVertical: 10, borderBottomColor: '#f0f0f0', borderBottomWidth: 1 }}>
-              <Text style={{ fontSize: 28, paddingVertical: 5 }}>Registrar Usuario</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', marginVertical: 10, borderBottomColor: '#f0f0f0', borderBottomWidth: 1 }}>
+              <Text style={{ fontSize: 28, paddingVertical: 5, textAlign: 'left' }}>Registrar Usuario</Text>
             </View>
 
             <View style={styles.modalRow}>
               <View>
                 <Text style={styles.subtitles2}>Departamento</Text>
-                <Picker style={styles.combo2} selectedValue={depar} onValueChange={(itemValue, itemIndex) => setNewUser({ ...newUser!, idDepartamento: parseInt(itemValue!) })}>
-                  <Picker.Item label="departamentos" value={0} enabled={false} />
-                  {departamentos.map(d => (
+                <Picker style={styles.combo2} selectedValue={depar} onValueChange={(itemValue, itemIndex) => setNewUser({ ...newUser!, idDepartamento: itemIndex! })}>
+                  {cargosLetras.map(d => (
                     <Picker.Item key={d.toString()} label={d.toString()} value={d} />
                   ))}
                 </Picker>
@@ -194,9 +242,8 @@ export const DataTable = ({ data }: Props) => {
 
               <View>
                 <Text style={styles.subtitles2}>Cargos</Text>
-                <Picker style={styles.combo2} selectedValue={cargo} onValueChange={(itemValue, itemIndex) => setNewUser({ ...newUser!, idCargo: parseInt(itemValue!) })}>
-                  <Picker.Item label="cargos" value={0} enabled={false} />
-                  {departamentos.map(d => (
+                <Picker style={styles.combo2} selectedValue={cargo} onValueChange={(itemValue, itemIndex) => setNewUser({ ...newUser!, idCargo: itemIndex! })}>
+                  {deparsLetras.map(d => (
                     <Picker.Item key={d.toString()} label={d.toString()} value={d} />
                   ))}
                 </Picker>
@@ -274,7 +321,9 @@ export const DataTable = ({ data }: Props) => {
                           return prevState
                         })
                       })
-                    } catch (error) {}
+                    } catch (error) {
+                      console.log(error)
+                    }
 
                     setBorrar(borrar => !borrar)
                     setModalUserOpen(false)
@@ -292,6 +341,35 @@ export const DataTable = ({ data }: Props) => {
           </View>
         </View>
       </ModalNewUser>
+
+      {/* ***********************************************MODAL ELIMINAR*/}
+      {/* ***********************************************MODAL ELIMINAR*/}
+
+      <ModalBorrar isOpen={modalEliminar}>
+        <View style={styles.container2}>
+          <View style={styles.modalEliminar}>
+            <Text style={{ marginHorizontal: 10, marginVertical: 5, paddingVertical: 15 }}>¿Esta seguro que desea eliminar el usuario Seleccionado?</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', margin: 10 }}>
+              <Pressable
+                style={{ width: 81, height: 29, margin: 10, backgroundColor: '#2F7DE3', borderRadius: 5 }}
+                onPress={() => {
+                  deleteUser(userEditar!.id!)
+                  setBorrar(!borrar)
+                  setModalEliminar(false)
+                }}
+              >
+                <Text style={{ color: 'white', paddingVertical: 5, textAlign: 'center' }}>Aceptar</Text>
+              </Pressable>
+              <Pressable
+                style={{ width: 81, height: 29, margin: 10, backgroundColor: '#white', borderRadius: 5, borderColor: '#d4d4d4', borderWidth: 1 }}
+                onPress={() => setModalEliminar(false)}
+              >
+                <Text style={{ color: '#2F7DE3', paddingVertical: 5, textAlign: 'center' }}>Cancelar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </ModalBorrar>
 
       {/* ***********************************************MODAL EDITAR*/}
       {/* ***********************************************MODAL EDITAR*/}
@@ -311,7 +389,7 @@ export const DataTable = ({ data }: Props) => {
                   onValueChange={(itemValue, itemIndex) => setUserEditar({ ...userEditar!, idDepartamento: parseInt(itemValue!) })}
                 >
                   <Picker.Item label="departamentos" value={0} />
-                  {departamentos.map(d => (
+                  {deparsLetras.map(d => (
                     <Picker.Item key={d.toString()} label={d.toString()} value={d} />
                   ))}
                 </Picker>
@@ -321,7 +399,7 @@ export const DataTable = ({ data }: Props) => {
                 <Text style={styles.subtitles2}>Cargos</Text>
                 <Picker style={styles.combo2} selectedValue={cargo} onValueChange={(itemValue, itemIndex) => setUserEditar({ ...userEditar!, idCargo: parseInt(itemValue!) })}>
                   <Picker.Item label="cargos" value={0} />
-                  {departamentos.map(d => (
+                  {cargosLetras.map(d => (
                     <Picker.Item key={d.toString()} label={d.toString()} value={d} />
                   ))}
                 </Picker>
@@ -395,24 +473,26 @@ export const DataTable = ({ data }: Props) => {
                   style={{ backgroundColor: '#006AB2', width: 143, height: 37, marginHorizontal: 15, borderRadius: 5 }}
                   onPress={async () => {
                     console.log(userEditar)
-                    await updateUser(userEditar!.id, userEditar).then(resp => {
-                      console.log(resp)
-                      setUsers(prevState => {
-                        const nuevos = [...prevState]
-                        const indice = nuevos.findIndex(user => user.id === userEditar?.id)
+                    await updateUser(userEditar!.id, formatearDatosINVER(userEditar!))
+                      .then(resp => {
+                        console.log(resp)
+                        setUsers(prevState => {
+                          const nuevos = [...prevState]
+                          const indice = nuevos.findIndex(user => user.id === userEditar?.id)
 
-                        if (indice !== -1) {
-                          nuevos[indice].idCargo = userEditar!.idCargo
-                          nuevos[indice].idDepartamento = userEditar!.idDepartamento
-                          nuevos[indice].primerApellido = userEditar!.primerApellido
-                          nuevos[indice].segundoApellido = userEditar!.segundoApellido
-                          nuevos[indice].primerNombre = userEditar!.primerNombre
-                          nuevos[indice].segundoNombre = userEditar!.segundoNombre
-                        }
+                          if (indice !== -1) {
+                            nuevos[indice].idCargo = userEditar!.idCargo
+                            nuevos[indice].idDepartamento = userEditar!.idDepartamento
+                            nuevos[indice].primerApellido = userEditar!.primerApellido
+                            nuevos[indice].segundoApellido = userEditar!.segundoApellido
+                            nuevos[indice].primerNombre = userEditar!.primerNombre
+                            nuevos[indice].segundoNombre = userEditar!.segundoNombre
+                          }
 
-                        return nuevos
+                          return nuevos
+                        })
                       })
-                    })
+                      .catch()
                     setModalOpen(false)
                   }}
                 >
@@ -513,10 +593,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#FEFEFE',
     borderRadius: 20,
     shadowColor: 'black',
-    borderColor: 'black',
+    borderColor: '#ededed',
     borderWidth: 1,
     flexDirection: 'column',
     justifyContent: 'space-between'
+  },
+  modalEliminar: {
+    width: 450,
+    height: 150,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    shadowColor: 'black',
+    borderColor: '#d4d4d4',
+    borderWidth: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    elevation: 5
   },
   inputs: {
     backgroundColor: '#fff',

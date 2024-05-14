@@ -21,7 +21,7 @@ export const getUsers = async () => {
   }
 }
 
-export const updateUser = async (userId: number, user1: user) => {
+export const updateUser = async (userId: number | undefined, user1: user) => {
   try {
     const response = await axios.put(`http://localhost:3001/api/users/${userId}`, user1)
     console.log('Usuario actualizado:', response.data)
