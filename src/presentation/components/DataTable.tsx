@@ -77,6 +77,7 @@ export const DataTable = ({ data }: Props) => {
   const [cargo, setCargo] = useState()
   const [borrar, setBorrar] = useState(false)
   const [userEditar, setUserEditar] = useState<user>()
+  const [userEliminar, SetUserEliminar] = useState<user>()
   const [newUser, setNewUser] = useState<user>({
     usuario: '',
     primerNombre: '',
@@ -103,7 +104,7 @@ export const DataTable = ({ data }: Props) => {
   }
 
   function eliminarUsuarioPorId(id: number) {
-    setUsers(data.filter(usuario => usuario.id !== id))
+    setUsers(users.filter(usuario => usuario.id !== id))
   }
 
   const formatearDatos = (format: user[]): user[] => {
@@ -163,7 +164,7 @@ export const DataTable = ({ data }: Props) => {
           style={styles.acciones}
           onPress={async () => {
             setModalEliminar(true)
-            setUserEditar(item)
+            SetUserEliminar(item)
           }}
         >
           <Icon name="trash-outline" type="ionicon" color={'#E51156'} />
@@ -353,7 +354,8 @@ export const DataTable = ({ data }: Props) => {
               <Pressable
                 style={{ width: 81, height: 29, margin: 10, backgroundColor: '#2F7DE3', borderRadius: 5 }}
                 onPress={() => {
-                  deleteUser(userEditar!.id!)
+                  deleteUser(userEliminar!.id!)
+                  eliminarUsuarioPorId(userEliminar!.id!)
                   setBorrar(!borrar)
                   setModalEliminar(false)
                 }}
@@ -386,9 +388,8 @@ export const DataTable = ({ data }: Props) => {
                 <Picker
                   style={styles.combo2}
                   selectedValue={depar}
-                  onValueChange={(itemValue, itemIndex) => setUserEditar({ ...userEditar!, idDepartamento: parseInt(itemValue!) })}
+                  onValueChange={(itemValue, itemIndex) => setUserEditar({ ...userEditar!, idDepartamento: itemIndex! })}
                 >
-                  <Picker.Item label="departamentos" value={0} />
                   {deparsLetras.map(d => (
                     <Picker.Item key={d.toString()} label={d.toString()} value={d} />
                   ))}
@@ -397,8 +398,7 @@ export const DataTable = ({ data }: Props) => {
 
               <View>
                 <Text style={styles.subtitles2}>Cargos</Text>
-                <Picker style={styles.combo2} selectedValue={cargo} onValueChange={(itemValue, itemIndex) => setUserEditar({ ...userEditar!, idCargo: parseInt(itemValue!) })}>
-                  <Picker.Item label="cargos" value={0} />
+                <Picker style={styles.combo2} selectedValue={cargo} onValueChange={(itemValue, itemIndex) => setUserEditar({ ...userEditar!, idCargo: itemIndex! })}>
                   {cargosLetras.map(d => (
                     <Picker.Item key={d.toString()} label={d.toString()} value={d} />
                   ))}
@@ -473,12 +473,12 @@ export const DataTable = ({ data }: Props) => {
                   style={{ backgroundColor: '#006AB2', width: 143, height: 37, marginHorizontal: 15, borderRadius: 5 }}
                   onPress={async () => {
                     console.log(userEditar)
-                    await updateUser(userEditar!.id, formatearDatosINVER(userEditar!))
+                    await updateUser(userEditar!.id, userEditar!)
                       .then(resp => {
                         console.log(resp)
                         setUsers(prevState => {
                           const nuevos = [...prevState]
-                          const indice = nuevos.findIndex(user => user.id === userEditar?.id)
+                          const indice = nuevos.findIndex(user => user.id === userEditar!.id)
 
                           if (indice !== -1) {
                             nuevos[indice].idCargo = userEditar!.idCargo
